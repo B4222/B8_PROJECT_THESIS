@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resume | Career Decision System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="upload-page">
+    <div class="top-nav">
+        <h2>Career Decision Support</h2>
+        <div class="nav-actions">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="nav-btn danger">Logout</a>
+        </div>
+    </div>
+
+    <section class="page-banner">
+        <div>
+            <span class="eyebrow">Resume Analysis</span>
+            <h1>Upload or paste your resume</h1>
+            <p>After login, this page lets students upload a file or paste resume text directly for analysis.</p>
+        </div>
+    </section>
+
+    <div class="content-card wide-card">
+        <h2>Upload / Reupload Resume</h2>
+        <p class="subtle-text">Supported file formats: PDF and DOCX. You can also paste plain resume text.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data" class="stack-form">
+            <label>Select Resume File</label>
+            <input type="file" name="resume" accept=".pdf,.docx">
+
+            <div class="divider-text">or</div>
+
+            <label>Paste Resume Text</label>
+            <textarea name="resume_text" rows="12" placeholder="Paste your resume content here..."></textarea>
+
+            <button type="submit">Analyze Resume</button>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</body>
+</html>

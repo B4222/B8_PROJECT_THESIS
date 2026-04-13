@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Career Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student_portal.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="hero">
+        <nav class="hero-nav">
+            <div class="brand">
+                <span class="brand-mark">CS</span>
+                <div>
+                    <strong>Career Support System</strong>
+                    <p>Resume to role roadmap</p>
+                </div>
+            </div>
+            <a class="hero-link" href="{{ url_for('home') }}">Back To App</a>
+        </nav>
+
+        <section class="hero-content">
+            <div class="hero-copy">
+                <span class="hero-chip">New Web Page Design</span>
+                <h1>Career guidance portal for login, resume upload, skill-gap tracking, and student progress.</h1>
+                <p>This page is a fresh web page built from your requested details. It shows attractive themed sections, matching job roles, missing skills, reference links, learning plan, practice sites, progress streaks, and charts.</p>
+                <div class="hero-actions">
+                    <a href="#auth" class="primary-btn">View Login Section</a>
+                    <a href="#progress" class="secondary-btn">View Progress Tracker</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="visual-card visual-resume">Resume</div>
+                <div class="visual-card visual-jobs">Jobs</div>
+                <div class="visual-card visual-skills">Skills</div>
+                <div class="visual-card visual-student">Student</div>
+            </div>
+        </section>
+    </header>
+
+    <main class="page-shell">
+        <section id="auth" class="section-card two-column">
+            <div class="section-copy">
+                <span class="section-label">1. Login And Register</span>
+                <h2>Create account if new, login directly if already registered</h2>
+                <p>This design keeps login and registration clear for students. The left side explains the flow, while the right side shows the actual form area.</p>
+                <ul class="feature-list">
+                    <li>Student-friendly background with career, job, and resume themed visuals</li>
+                    <li>Simple CSS styling with strong colors and rounded cards</li>
+                    <li>Separate login and register actions</li>
+                </ul>
+            </div>
+            <div class="auth-panels">
+                <div class="mini-card">
+                    <h3>Login</h3>
+                    <input type="email" placeholder="Email">
+                    <input type="password" placeholder="Password">
+                    <button type="button">Login</button>
+                </div>
+                <div class="mini-card">
+                    <h3>Register</h3>
+                    <input type="text" placeholder="Full name">
+                    <input type="email" placeholder="Email">
+                    <input type="password" placeholder="Create password">
+                    <button type="button">Create Account</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card upload-banner">
+            <div>
+                <span class="section-label">2. Resume Upload</span>
+                <h2>Upload or paste resume text after login</h2>
+                <p>Students can choose a file or paste resume content directly before analysis.</p>
+            </div>
+            <div class="upload-box">
+                <label>Upload Resume</label>
+                <input type="file">
+                <label>Paste Resume Text</label>
+                <textarea rows="8" placeholder="Paste resume text here..."></textarea>
+                <button type="button">Analyze Resume</button>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <span>Student</span>
+                <strong>{{ payload.student_name }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Selected Role</span>
+                <strong>{{ payload.selected_role }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Resume Score</span>
+                <strong>{{ payload.role_score }}%</strong>
+            </article>
+            <article class="stat-card">
+                <span>Current Streak</span>
+                <strong>{{ payload.streak_days }} Days</strong>
+            </article>
+        </section>
+
+        <section class="section-card">
+            <span class="section-label">3. Resume Analysis</span>
+            <h2>Extracted skills from the uploaded resume</h2>
+            <div class="skills-wrap">
+                {% for skill in payload.extracted_skills %}
+                <span class="skill-pill">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-card">
+            <span class="section-label">4. Show All Matching Career Roles</span>
+            <h2>Students can compare first, second, and third priority job options</h2>
+            <div class="role-grid">
+                {% for role in payload.matching_roles %}
+                <article class="role-card">
+                    <div class="role-head">
+                        <h3>{{ role.role }}</h3>
+                        <span>{{ role.score }}%</span>
+                    </div>
+                    <p><strong>Matched Skills:</strong> {{ ", ".join(role.matched) }}</p>
+                    <p><strong>Missing Skills:</strong> {{ ", ".join(role.missing) }}</p>
+                    <button type="button" {% if role.role == payload.selected_role %}class="selected-btn"{% endif %}>
+                        {% if role.role == payload.selected_role %}Selected Job{% else %}Select Job{% endif %}
+                    </button>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-card two-column">
+            <div>
+                <span class="section-label">5. Missing Skills</span>
+                <h2>Required skills for {{ payload.selected_role }}</h2>
+                <ul class="check-list">
+                    {% for skill in payload.required_skills %}
+                    <li class="{% if skill in payload.missing_skills %}missing{% else %}done{% endif %}">
+                        <span class="check-box">{% if skill in payload.missing_skills %}□{% else %}✓{% endif %}</span>
+                        {{ skill }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <span class="section-label">6. Learning Start Point</span>
+                <h2>How to start learning</h2>
+                <div class="info-stack">
+                    <div class="info-box">
+                        <h3>Start Here</h3>
+                        <p>Begin with Excel formulas, move to pivot tables, then learn Power BI dashboards and visualization storytelling.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>How To Learn</h3>
+                        <p>Study 45 to 60 minutes per day, complete one small task daily, then reupload the resume to measure score improvement.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card two-column">
+            <div>
+                <span class="section-label">7. Reference Links</span>
+                <h2>Up to 10 learning references including YouTube</h2>
+                <ul class="link-list">
+                    {% for link in payload.references %}
+                    <li><a href="{{ link }}" target="_blank" rel="noopener noreferrer">{{ link }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <span class="section-label">8. Practice Websites</span>
+                <h2>Suggested practice platforms</h2>
+                <div class="practice-grid">
+                    {% for site in payload.practice_sites %}
+                    <div class="practice-card">{{ site }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section id="progress" class="section-card two-column">
+            <div>
+                <span class="section-label">9. Daily Learning Program</span>
+                <h2>Task list with time and streak tracking</h2>
+                <div class="timeline">
+                    {% for item in payload.learning_plan %}
+                    <div class="timeline-item">
+                        <div class="timeline-day">Day {{ item.day }}</div>
+                        <div class="timeline-body">
+                            <h3>{{ item.title }}</h3>
+                            <p>{{ item.time }}</p>
+                            <span class="status-badge status-{{ item.status.lower().replace(' ', '-') }}">{{ item.status }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <span class="section-label">10. Daily Updates</span>
+                <h2>Student progress capture</h2>
+                <ul class="update-list">
+                    {% for update in payload.daily_updates %}
+                    <li>{{ update }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="report-card">
+                    <h3>Progress Report</h3>
+                    <p>After improving the resume, the student can reupload it and check the updated score for the selected role.</p>
+                    <button type="button">Download Report</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="chart-grid">
+            <article class="section-card">
+                <span class="section-label">11. Matching Jobs Chart</span>
+                <h2>Role comparison</h2>
+                <canvas id="roleChart"></canvas>
+            </article>
+            <article class="section-card">
+                <span class="section-label">12. Resume Score Chart</span>
+                <h2>Before and after reupload</h2>
+                <canvas id="scoreChart"></canvas>
+            </article>
+            <article class="section-card chart-wide">
+                <span class="section-label">13. Point And Figure Chart</span>
+                <h2>Student progress chart</h2>
+                <canvas id="progressChart"></canvas>
+            </article>
+        </section>
+    </main>
+
+    <script>
+        window.studentPortalCharts = {{ payload.chart_payload | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/student_portal.js') }}"></script>
+</body>
+</html>

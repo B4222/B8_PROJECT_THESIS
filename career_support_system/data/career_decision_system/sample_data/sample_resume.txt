@@ -1,0 +1,25 @@
+John Student
+Email: john.student@example.com
+Phone: +1-555-101-2020
+
+Summary
+Motivated student with strong interest in analytics and AI. Experienced in Python-based projects and SQL querying.
+
+Skills
+- Python
+- SQL
+- Data Analysis
+- Statistics
+- HTML
+- CSS
+- JavaScript
+
+Projects
+1. Student Performance Dashboard
+   Built a dashboard using Python and data visualization techniques to track academic trends.
+
+2. Sales Data Analysis
+   Performed SQL queries and Python analysis to identify business insights.
+
+Education
+Bachelor of Technology in Computer Science

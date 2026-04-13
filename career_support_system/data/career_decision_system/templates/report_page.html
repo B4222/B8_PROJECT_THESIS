@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Report | Career Decision System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="report-page">
+    <div class="top-nav">
+        <h2>Career Decision Support</h2>
+        <div class="nav-actions">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="nav-btn danger">Logout</a>
+        </div>
+    </div>
+
+    <section class="page-banner">
+        <div>
+            <span class="eyebrow">Download Report</span>
+            <h1>Export your progress report</h1>
+            <p>Download the PDF report with selected job role, missing skills, learning plan, practice sites, and progress summary.</p>
+        </div>
+    </section>
+
+    <div class="content-card wide-card center-card">
+        <h2>Career Report</h2>
+        <p>Generate and download your personalized career progress report in PDF format.</p>
+        <a href="{{ url_for('report') }}" class="nav-btn">Download Career Report</a>
+    </div>
+</body>
+</html>

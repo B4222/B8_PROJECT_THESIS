@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Career Decision System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page register-page">
+    <div class="theme-toggle-wrap">
+        <button id="themeToggle" class="theme-btn">Toggle Theme</button>
+    </div>
+
+    <main class="hero-shell">
+        <section class="hero-panel">
+            <div class="hero-copy">
+                <span class="eyebrow">New Student</span>
+                <h1>Create an account and start building your career roadmap.</h1>
+                <p>Register once, upload your resume, choose the job you want, and track missing skills with daily progress updates.</p>
+            </div>
+            <div class="hero-icons" aria-hidden="true">
+                <span>RESUME</span>
+                <span>TARGET</span>
+                <span>ROLE</span>
+                <span>TRACK</span>
+            </div>
+        </section>
+
+        <section class="auth-container">
+            <h2>Student Registration</h2>
+            <p class="subtle-text">If you do not have an account, create one here.</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="Enter your full name" required>
+
+                <label>Email</label>
+                <input type="email" name="email" placeholder="student@example.com" required>
+
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Create password" required>
+
+                <button type="submit">Create Account</button>
+            </form>
+            <p>Already registered? <a href="{{ url_for('login') }}">Login here</a></p>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</body>
+</html>

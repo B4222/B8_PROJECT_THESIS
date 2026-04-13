@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Career Decision System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="theme-toggle-wrap">
+        <button id="themeToggle" class="theme-btn">Toggle Theme</button>
+    </div>
+
+    <div class="top-nav">
+        <h2>Welcome, {{ user_name }}</h2>
+        <div class="nav-actions">
+            <a href="{{ url_for('upload_resume') }}" class="nav-btn">Upload Resume</a>
+            <a href="{{ url_for('report_page') }}" class="nav-btn">Report Page</a>
+            <a href="{{ url_for('logout') }}" class="nav-btn danger">Logout</a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-wrap">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if not payload.has_resume %}
+        <div class="content-card wide-card">
+            <h2>No Resume Uploaded Yet</h2>
+            <p>Upload your resume to start skill extraction, role matching, and progress tracking.</p>
+            <a href="{{ url_for('upload_resume') }}" class="nav-btn">Upload Resume</a>
+        </div>
+    {% else %}
+        <section class="page-banner">
+            <div>
+                <span class="eyebrow">Career Dashboard</span>
+                <h1>See all matching jobs and choose your target role</h1>
+                <p>Your latest resume was analyzed from {{ payload.resume_source_type }} input. Pick any matching role and the system will show missing skills, learning links, practice websites, and progress charts.</p>
+            </div>
+            <div class="metric-strip">
+                <div class="metric-card">
+                    <span>Selected Role</span>
+                    <strong>{{ payload.selected_role }}</strong>
+                </div>
+                <div class="metric-card">
+                    <span>Current Match</span>
+                    <strong>{{ payload.selected_match.match_score if payload.selected_match else 0 }}%</strong>
+                </div>
+                <div class="metric-card">
+                    <span>Daily Streak</span>
+                    <strong>{{ payload.streak_days }} day{{ '' if payload.streak_days == 1 else 's' }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid">
+            <div class="content-card">
+                <h3>Extracted Skills</h3>
+                <div class="tag-list">
+                    {% for skill in payload.extracted_skills %}
+                    <span class="tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Selected Role Summary</h3>
+                {% if payload.selected_match %}
+                    <p><strong>Role:</strong> {{ payload.selected_match.role }}</p>
+                    <p><strong>Score:</strong> {{ payload.selected_match.match_score }}%</p>
+                    <p><strong>Reason:</strong> {{ payload.selected_match.reason }}</p>
+                    <p><strong>Required Skills:</strong> {{ ", ".join(payload.selected_match.required_skills) }}</p>
+                {% endif %}
+            </div>
+
+            <div class="content-card">
+                <h3>Progress Summary</h3>
+                <p><strong>Completed:</strong> {{ payload.progress_summary.completed }}</p>
+                <p><strong>In Progress:</strong> {{ payload.progress_summary.in_progress }}</p>
+                <p><strong>Not Started:</strong> {{ payload.progress_summary.not_started }}</p>
+                <p><strong>Reupload Resume:</strong> After improving your skills, upload the resume again to check your score for the selected job.</p>
+            </div>
+        </div>
+
+        <div class="content-card wide-card">
+            <h3>All Matching Career Roles</h3>
+            <div class="role-grid">
+                {% for item in payload.recommendations %}
+                <div class="role-card {% if item.role == payload.selected_role %}selected-role{% endif %}">
+                    <h4>{{ item.role }}</h4>
+                    <p class="role-score">{{ item.match_score }}% Match</p>
+                    <p>{{ item.reason }}</p>
+                    <p><strong>Matched:</strong> {{ ", ".join(item.matched_skills) if item.matched_skills else "None yet" }}</p>
+                    <p><strong>Missing:</strong> {{ ", ".join(item.missing_skills) if item.missing_skills else "No gaps" }}</p>
+                    <form method="POST" action="{{ url_for('select_role') }}">
+                        <input type="hidden" name="role_name" value="{{ item.role }}">
+                        <button type="submit">{% if item.role == payload.selected_role %}Selected{% else %}Select Role{% endif %}</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="content-card">
+                <h3>Missing Skills Checklist</h3>
+                {% if payload.progress_data %}
+                    {% for item in payload.progress_data %}
+                    <form method="POST" action="{{ url_for('update_progress') }}" class="progress-form">
+                        <input type="hidden" name="skill" value="{{ item.skill }}">
+                        <input type="hidden" name="role_name" value="{{ payload.selected_role }}">
+                        <label>{{ item.skill }}</label>
+                        <div class="progress-row">
+                            <select name="status">
+                                <option value="Not Started" {% if item.status == "Not Started" %}selected{% endif %}>Not Started</option>
+                                <option value="In Progress" {% if item.status == "In Progress" %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if item.status == "Completed" %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </div>
+                    </form>
+                    {% endfor %}
+                {% else %}
+                    <p>No skill gaps found for this selected role.</p>
+                {% endif %}
+            </div>
+
+            <div class="content-card">
+                <h3>10-Day Learning Program</h3>
+                {% if payload.daily_plan %}
+                    <ul class="clean-list">
+                        {% for item in payload.daily_plan %}
+                        <li>Day {{ item.day }}: {{ item.skill }} - {{ item.task }} ({{ item.minutes }} min)</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No daily plan is needed right now.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="content-card wide-card">
+            <h3>How To Learn Missing Skills</h3>
+            {% if payload.learning_guidance %}
+                <div class="learning-grid">
+                    {% for skill, guide in payload.learning_guidance.items() %}
+                        <div class="guidance-block">
+                            <h4>{{ skill }}</h4>
+                            <p><strong>Required for role:</strong> {{ payload.selected_role }}</p>
+                            <p><strong>Topics:</strong> {{ ", ".join(guide.topics) }}</p>
+                            <p><strong>Where to start:</strong> {{ guide.start }}</p>
+                            <p><strong>How to learn:</strong> {{ guide.how_to_learn }}</p>
+                            <p><strong>Daily time:</strong> {{ guide.daily_minutes }} minutes</p>
+                            <p><strong>Practice websites:</strong> {{ ", ".join(guide.practice_sites) }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No additional guidance required.</p>
+            {% endif %}
+        </div>
+
+        <div class="grid">
+            <div class="content-card">
+                <h3>Reference Links</h3>
+                {% if payload.reference_links %}
+                    <ul class="clean-list">
+                        {% for link in payload.reference_links %}
+                        <li><a href="{{ link }}" target="_blank" rel="noopener noreferrer">{{ link }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No links available.</p>
+                {% endif %}
+            </div>
+
+            <div class="content-card">
+                <h3>Practice Websites</h3>
+                {% if payload.practice_sites %}
+                    <ul class="clean-list">
+                        {% for site in payload.practice_sites %}
+                        <li>{{ site }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No practice websites listed.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="content-card">
+                <h3>Role Match Scores</h3>
+                <canvas id="roleChart"></canvas>
+            </div>
+            <div class="content-card">
+                <h3>Resume Score Before vs After Progress</h3>
+                <canvas id="improvementChart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="content-card">
+                <h3>Readiness Trend</h3>
+                <canvas id="readinessChart"></canvas>
+            </div>
+            <div class="content-card">
+                <h3>Progress Point & Figure Chart</h3>
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+
+        <div class="content-card actions">
+            <a href="{{ url_for('upload_resume') }}" class="nav-btn">Reupload Resume</a>
+            <a href="{{ url_for('report') }}" class="nav-btn">Download Progress Report (PDF)</a>
+        </div>
+
+        <script>
+            window.chartPayload = {{ payload.charts | tojson }};
+        </script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</body>
+</html>

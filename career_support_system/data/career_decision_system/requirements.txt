@@ -1,0 +1,5 @@
+Flask==3.1.0
+spacy==3.8.2
+pdfminer.six==20240706
+python-docx==1.1.2
+fpdf2==2.8.2

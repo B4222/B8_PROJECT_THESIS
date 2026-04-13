@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Career Decision System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="theme-toggle-wrap">
+        <button id="themeToggle" class="theme-btn">Toggle Theme</button>
+    </div>
+
+    <main class="hero-shell">
+        <section class="hero-panel">
+            <div class="hero-copy">
+                <span class="eyebrow">Career Support System</span>
+                <h1>Login and continue your resume-to-career journey.</h1>
+                <p>Upload your resume, view all matching jobs, track skill progress, and improve your score step by step.</p>
+            </div>
+            <div class="hero-icons" aria-hidden="true">
+                <span>CV</span>
+                <span>JOB</span>
+                <span>AI</span>
+                <span>SKILL</span>
+            </div>
+        </section>
+
+        <section class="auth-container">
+            <h2>Student Login</h2>
+            <p class="subtle-text">If you already have an account, login directly.</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="student@example.com" required>
+
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter password" required>
+
+                <button type="submit">Login</button>
+            </form>
+            <p>No account? <a href="{{ url_for('register') }}">Create one here</a></p>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</body>
+</html>
