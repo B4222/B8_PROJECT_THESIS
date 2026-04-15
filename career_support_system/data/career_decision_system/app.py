@@ -790,6 +790,4 @@ def student_portal():
     return render_template("student_portal.html", payload=demo_payload)
 
 
-if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+init_db()
